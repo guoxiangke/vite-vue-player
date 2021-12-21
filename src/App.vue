@@ -23,6 +23,10 @@ export default {
     },
     // Fetches posts when the component is created.
     async created() {
+      const audios = this.$storage.getStorageSync('audios')
+      if(audios){
+        this.audios = audios
+      }else{
         try {
           const response = await axios.get(`https://open.ly.yongbuzhixi.com/api/today`)
           // console.log(response.data.data)
@@ -37,11 +41,18 @@ export default {
               // response.data.data[i]['program_name']
               this.audios.push(item);
           }
+          var d = new Date();
+          var h = d.getHours();
+          var m = d.getMinutes();
+          var s = d.getSeconds();
+          let ttl = -3600*h-60*m-s+86400;
+          this.$storage.setStorageSync("audios", this.audios, ttl*1000);
 
         } catch (e) {
           // this.errors.push(e)
           console.log(e)
         }
+      }
     },
     setup(){
 
@@ -322,7 +333,7 @@ export default {
               <p class="text-sm text-grey mt-1">{{audio.artist}}</p>
             </div>
             <div class="m-auto relative" style="width:300px;height:300px">
-              <img class="w-full rounded-full block m-auto h-full" src="https://tailwindcss.com/img/card-top.jpg" alt="Album Pic">
+              <img :class="pauseTrack?'art':''" class="w-full rounded-full block m-auto h-full" src="/card-top.jpg" alt="Album Pic">
               <div class="cd-center">
               </div>
             </div>
@@ -367,10 +378,10 @@ export default {
           <li @click="selectSound(indexo)" :style="indexo == index ? '' : ''" :class="indexo == index ? 'bg-gradient-to-r from-red-400 via-red-500 to-red-600 text-white':''" class="flex py-2 rounded cursor-pointer w-11/12 m-auto" v-for="(audio,indexo) in audios" :key="indexo">
             <div class="w-1/5  flex items-center justify-center font-semibold m-auto">
               <!-- <span>{{indexo + 1}}</span> -->
-              <svg v-if="state.audioPlaying[indexo]" class="w-6 h-6 m-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <svg v-if="state.audioPlaying[indexo]" class="w-8 h-8 m-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                 <path d="M5 4h3v12H5V4zm7 0h3v12h-3V4z"/>
               </svg>
-              <svg v-else class="w-6 h-6 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg v-else class="w-8 h-8 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -382,10 +393,10 @@ export default {
               </div>
             </div>
             <div class="w-1/5 m-auto">
-              <svg v-if="state.audioPlaying[indexo]" class="w-6 h-6 m-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <svg v-if="state.audioPlaying[indexo]" class="w-8 h-8 m-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                 <path d="M5 4h3v12H5V4zm7 0h3v12h-3V4z"/>
               </svg>
-              <svg v-else class="w-6 h-6 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg v-else class="w-8 h-8 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -394,12 +405,12 @@ export default {
         </ul>
   </div>
 </div>
+
 <footer class="relative hidden  pt-8 pb-6 mt-8 bg-gradient-to-r from-gray-300 to-gray-400">
   <div class="container mx-auto px-4">
 
     <div class="flex h-16 items-center justify-center m-auto">
       <div class="w-2/12 md:flex items-center hidden" v-for="(audio,indexo) in audios.slice(index, index + 1)" :key="indexo">
-        <img class="w-10 h-10 rounded-full" src="https://tailwindcss.com/img/card-top.jpg">
         <div class="flex flex-col ml-2 font-semibold">
           <p>{{audio.name}}</p>
           <p class="h-4 overflow-hidden text-xs text-gray-600">{{audio.artist}}</p>
@@ -422,7 +433,7 @@ export default {
           <p>{{duration}}</p>
         </div>
       </div>
-      <div class="flex md:w-2/12 m-auto items-center hidden">
+      <div class="flex md:w-2/12 m-auto items-center">
         <div class="w-3/12 md:w-2/12 hover:bg-gray-500 rounded-full md:p-1" @click="mute()">
           <svg v-if="mutePlayer" class="w-6 h-6 m-auto text-red-500 cursor-pointer" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" />
@@ -445,10 +456,20 @@ export default {
     </div>
   </div>
 </footer>
+
 </section>
 </template>
 
 <style>
+.art {
+  animation: rolling-disk 7.5s 0.25s linear infinite;
+  /*animation: rotation 2s infinite linear;*/
+}
+
+@keyframes rolling-disk {
+    0%      {transform: rotate(0);}
+    100%    {transform: rotate(1turn);}
+}
 #journal-scroll::-webkit-scrollbar {
     width: 4px;
     cursor: pointer;
