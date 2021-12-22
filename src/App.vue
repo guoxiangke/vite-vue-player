@@ -11,7 +11,8 @@ import axios from 'axios';
 export default {
     data() {
         return {
-          audios: []
+          audios: [],
+          isToday: true
         }
     },
     mounted(){ 
@@ -23,7 +24,7 @@ export default {
     },
     // Fetches posts when the component is created.
     async created() {
-      const audios = this.$storage.getStorageSync('audios')
+      const audios = this.$storage.getStorageSync('today')
       if(audios){
         this.audios = audios
       }else{
@@ -36,6 +37,8 @@ export default {
                     name: response.data.data[i].program_name,
                     file: response.data.data[i].link,
                     artist: response.data.data[i].description,
+                    code: response.data.data[i].code,
+                    play_at: response.data.data[i].play_at,
                     howl: null
                 }
               // response.data.data[i]['program_name']
@@ -46,11 +49,52 @@ export default {
           var m = d.getMinutes();
           var s = d.getSeconds();
           let ttl = -3600*h-60*m-s+86400;
-          this.$storage.setStorageSync("audios", this.audios, ttl*1000);
+          this.$storage.setStorageSync("today", this.audios, ttl*1000);
 
         } catch (e) {
           // this.errors.push(e)
           console.log(e)
+        }
+      }
+    },
+    methods: {
+      async backToday(){
+        this.audios = this.$storage.getStorageSync('today')
+        this.isToday = true
+      },
+      async more(code) {
+        const audios = this.$storage.getStorageSync(code)
+        this.isToday = false
+        if(audios){
+          this.audios = audios
+        }else{
+          try {
+            const response = await axios.get(`https://open.ly.yongbuzhixi.com/api/program/` + code)
+            // console.log(response.data.data)
+            this.audios = [];
+            for (var i = response.data.data.length - 1; i >= 0; i--) {
+                const item = {
+                      name: response.data.data[i].program_name,
+                      file: response.data.data[i].link,
+                      artist: response.data.data[i].description,
+                      code: response.data.data[i].code,
+                      play_at: response.data.data[i].play_at,
+                      howl: null
+                  }
+                // response.data.data[i]['program_name']
+                this.audios.push(item);
+            }
+            var d = new Date();
+            var h = d.getHours();
+            var m = d.getMinutes();
+            var s = d.getSeconds();
+            let ttl = -3600*h-60*m-s+86400;
+            this.$storage.setStorageSync(code, this.audios, ttl*1000);
+
+          } catch (e) {
+            // this.errors.push(e)
+            console.log(e)
+          }
         }
       }
     },
@@ -83,6 +127,7 @@ export default {
 
             return (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
         }
+        
         function play(){
 
             var sound;
@@ -326,7 +371,7 @@ export default {
 <div class="  h-screen  items-center flex flex-wrap">
   <div class="w-full md:w-4/12 px-4">
 
-        <div class="flex flex-col w-full bg-gray-100 border-b border-b-red-500">
+        <div class="flex flex-col w-full bg-gray-100 border-b-2 border-b-red-500">
           <div class="m-auto w-4/5 mt-4 mb-0 text-center">
             <div v-for="(audio,indexo) in audios.slice(index,index+1)" :key="indexo" class="mb-4">
               <h3 class="text-xl text-grey-darkest font-semibold">{{audio.name}}</h3>
@@ -369,37 +414,49 @@ export default {
               </svg>
             </div>
           </div>
+          <div style="font-family:monospace" class="flex w-full m-auto justify-between items-center "> 
+            <div>{{duration}}</div>
+            <div>{{timer}}</div>
+          </div>
         </div>
-        <div class="text-right text-sm  border-t border-t-red-500" :style="{'width' : step + '%'}" >{{timer}}/{{duration}}</div>
+        <div class="text-right  border-t-0 border-t-red-500" :style="{'width' : step + '%'}" >
+          <span class=" timer bg-gray-100 text-white pl-0 pr-3 p-1 rounded-full text-xs "></span>
+        </div>
         </div>
   <div class="w-full md:w-8/12 px-4 h-screen" style="overflow:scroll;">
     
         <ul class="rounded-lg w-full overflow-auto m-auto mb-2 bg-gray-100 pt-2 min-h-96 " id="journal-scroll">
-          <li @click="selectSound(indexo)" :style="indexo == index ? '' : ''" :class="indexo == index ? 'bg-gradient-to-r from-red-400 via-red-500 to-red-600 text-white':''" class="flex py-2 rounded cursor-pointer w-11/12 m-auto" v-for="(audio,indexo) in audios" :key="indexo">
-            <div class="w-1/5  flex items-center justify-center font-semibold m-auto">
-              <!-- <span>{{indexo + 1}}</span> -->
-              <svg v-if="state.audioPlaying[indexo]" class="w-8 h-8 m-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M5 4h3v12H5V4zm7 0h3v12h-3V4z"/>
-              </svg>
-              <svg v-else class="w-8 h-8 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+          <li :style="indexo == index ? '' : ''" :class="indexo == index ? 'bg-gradient-to-r from-red-400 via-red-500 to-red-600 text-white':''" class="flex py-2 rounded w-11/12 m-auto" v-for="(audio,indexo) in audios" :key="indexo">
+            <div   @click="selectSound(indexo)" class="cursor-pointer w-1/5  flex items-center justify-center font-semibold m-auto">
+              <span>{{indexo + 1}}</span>
             </div>
-            <div class="w-3/5 font-semibold text-left m-auto">
+            <div  @click="selectSound(indexo)" class="cursor-pointer w-3/5 font-semibold text-left m-auto">
               <div class="font-semibold text-sm">
-                <p>{{audio.name}}</p>
+                <p>{{audio.name}} {{audio.play_at.substr(2)}}</p>
                 <p class="text-xs" :class="indexo == index ? '' : 'text-gray-600' ">{{audio.artist}}</p>
               </div>
             </div>
             <div class="w-1/5 m-auto">
-              <svg v-if="state.audioPlaying[indexo]" class="w-8 h-8 m-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M5 4h3v12H5V4zm7 0h3v12h-3V4z"/>
-              </svg>
-              <svg v-else class="w-8 h-8 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <div class="flex w-4/5 m-auto justify-between items-center">
+
+                <div class="cursor-pointer ">
+                  <svg  @click="pause()" v-if="state.audioPlaying[indexo]"  class="w-10 h-10 m-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M5 4h3v12H5V4zm7 0h3v12h-3V4z"/>
+                  </svg>
+                  <svg @click="selectSound(indexo)" v-else  class="w-10 h-10 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+
+                <div v-if="isToday" >
+                  <svg  @click="more(audio.code)" class="w-10 h-10 m-auto cursor-pointer"  height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M20 12l-2.83 2.83 9.17 9.17-9.17 9.17 2.83 2.83 12-12z"/><path d="M0 0h48v48h-48z" fill="none"/></svg>
+                </div>
+                <div v-else>
+                  <svg @click="backToday" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M30.83 32.67l-9.17-9.17 9.17-9.17-2.83-2.83-12 12 12 12z"/><path d="M0-.5h48v48h-48z" fill="none"/></svg>
+                </div>
+              </div>
+              
             </div>
           </li>
         </ul>
@@ -461,6 +518,17 @@ export default {
 </template>
 
 <style>
+
+.timer:before {
+ content: "";
+   position: relative;
+   top: -27px;
+   right: -20px;
+   border-bottom: 8px solid black;
+   border-bottom-color: black; 
+   border-left: 8px solid transparent;
+   border-right: 8px solid transparent; 
+}
 .art {
   animation: rolling-disk 7.5s 0.25s linear infinite;
   /*animation: rotation 2s infinite linear;*/
