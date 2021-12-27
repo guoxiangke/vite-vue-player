@@ -12,15 +12,12 @@ export default {
     data() {
         return {
           audios: [],
+          current: [],
           isToday: true
         }
     },
     mounted(){ 
       var sound = this.audios[this.index].howl;
-      
-        var barWidth = (0.9 * 100) / 100;
-        this.sliderBtnVol = (this.volBar.offsetWidth * barWidth + this.volBar.offsetWidth * 0.05 - 25);
-          
     },
     // Fetches posts when the component is created.
     async created() {
@@ -31,19 +28,7 @@ export default {
         try {
           const response = await axios.get(`https://open.ly.yongbuzhixi.com/api/today`)
           // console.log(response.data.data)
-          this.audios.pop();
-          for (var i = response.data.data.length - 1; i >= 0; i--) {
-              const item = {
-                    name: response.data.data[i].program_name,
-                    file: response.data.data[i].link,
-                    artist: response.data.data[i].description,
-                    code: response.data.data[i].code,
-                    play_at: response.data.data[i].play_at,
-                    howl: null
-                }
-              // response.data.data[i]['program_name']
-              this.audios.push(item);
-          }
+          this.audios = response.data.data
           var d = new Date();
           var h = d.getHours();
           var m = d.getMinutes();
@@ -65,25 +50,15 @@ export default {
       async more(code) {
         const audios = this.$storage.getStorageSync(code)
         this.isToday = false
+
         if(audios){
           this.audios = audios
         }else{
           try {
             const response = await axios.get(`https://open.ly.yongbuzhixi.com/api/program/` + code)
             // console.log(response.data.data)
-            this.audios = [];
-            for (var i = response.data.data.length - 1; i >= 0; i--) {
-                const item = {
-                      name: response.data.data[i].program_name,
-                      file: response.data.data[i].link,
-                      artist: response.data.data[i].description,
-                      code: response.data.data[i].code,
-                      play_at: response.data.data[i].play_at,
-                      howl: null
-                  }
-                // response.data.data[i]['program_name']
-                this.audios.push(item);
-            }
+            this.audios = response.data.data
+
             var d = new Date();
             var h = d.getHours();
             var m = d.getMinutes();
@@ -113,7 +88,7 @@ export default {
         const timer = ref('00:00');
         const pauseTrack = ref(false);
         const progress = ref(null);
-        const volBar = ref(null);
+        // const volBar = ref(null);
         const sliderBtn = ref(0);
         const sliderBtnVol = ref(null);
         const volumeProgress = ref(90);
@@ -138,7 +113,7 @@ export default {
             }else{
                 state.audioPlaying[index.value] = false;
                 sound = audio.howl =  new Howl({
-                src: [audio.file],
+                src: [audio.link],
                 html5: true, // A live stream can only be played through HTML5 Audio.
                 format: ['mp3', 'aac'],
                 onplay: function(){
@@ -148,7 +123,7 @@ export default {
                     prevButton.value = true;
                     duration.value = formatTime(sound.duration());
                     requestAnimationFrame(stepFunction.bind(this));
-                    
+
                 },
                 onpause: function(){
 
@@ -333,15 +308,15 @@ export default {
             
         }
 
-        function volume(event){
+        // function volume(event){
     
-            var per = event.layerX / parseFloat(volBar.value.scrollWidth);
-            var barWidth = (per * 100) / 100;
-            volumeProgress.value = barWidth * 100;
-            sliderBtnVol.value = (volBar.value.offsetWidth * barWidth + volBar.value.offsetWidth * 0.05 - 25);
-            Howler.volume(per);
+        //     var per = event.layerX / parseFloat(volBar.value.scrollWidth);
+        //     var barWidth = (per * 100) / 100;
+        //     volumeProgress.value = barWidth * 100;
+        //     sliderBtnVol.value = (volBar.value.offsetWidth * barWidth + volBar.value.offsetWidth * 0.05 - 25);
+        //     Howler.volume(per);
 
-        }
+        // }
 
         function mute() {
             
@@ -358,7 +333,7 @@ export default {
         return{
             play,pause,duration,formatTime,audios,pauseTrack,next,previous,
             index,timer,step,stepFunction,seek,selectSound,state,random,repeat,
-            progress,volume,volBar,volumeProgress,sliderBtn,mute,mutePlayer,
+            progress,volumeProgress,sliderBtn,mute,mutePlayer,
             sliderBtnVol,nextButton,prevButton
         }
     }
@@ -370,12 +345,11 @@ export default {
 <section class="relative bg-gray-100">
 <div class="  h-screen  items-center flex flex-wrap">
   <div class="w-full md:w-4/12 px-4">
-
-        <div class="flex flex-col w-full bg-gray-100 border-b-2 border-b-red-500">
+        <div class="flex flex-col w-full bg-gray-100 mb-4">
           <div class="m-auto w-4/5 mt-4 mb-0 text-center">
             <div v-for="(audio,indexo) in audios.slice(index,index+1)" :key="indexo" class="mb-4">
-              <h3 class="text-xl text-grey-darkest font-semibold">{{audio.name}}</h3>
-              <p class="text-sm text-grey mt-1">{{audio.artist}}</p>
+              <h3 class="text-xl text-grey-darkest font-semibold">{{audio.program_name}}</h3>
+              <p class="text-sm text-grey mt-1">{{audio.description}}</p>
             </div>
             <div class="m-auto relative" style="width:300px;height:300px">
               <img :class="pauseTrack?'art':''" class="w-full rounded-full block m-auto h-full" src="/card-top.jpg" alt="Album Pic">
@@ -418,13 +392,15 @@ export default {
             <div>{{duration}}</div>
             <div>{{timer}}</div>
           </div>
+          <input @click="seek($event)" ref="progress" :value="step" class="w-full cursor-pointer range-slider__range" type="range" min="0" step="0.01" max="100">
         </div>
-        <div class="text-right  border-t-0 border-t-red-500" :style="{'width' : step + '%'}" >
+        <div class="hidden text-right  border-t-0 border-t-red-500" :style="{'width' : step + '%'}" >
           <span class=" timer bg-gray-100 text-white pl-0 pr-3 p-1 rounded-full text-xs "></span>
         </div>
+        
         </div>
+  
   <div class="w-full md:w-8/12 px-4 h-screen" style="overflow:scroll;">
-    
         <ul class="rounded-lg w-full overflow-auto m-auto mb-2 bg-gray-100 pt-2 min-h-96 " id="journal-scroll">
           <li :style="indexo == index ? '' : ''" :class="indexo == index ? 'bg-gradient-to-r from-red-400 via-red-500 to-red-600 text-white':''" class="flex py-2 rounded w-11/12 m-auto" v-for="(audio,indexo) in audios" :key="indexo">
             <div   @click="selectSound(indexo)" class="cursor-pointer w-1/5  flex items-center justify-center font-semibold m-auto">
@@ -432,8 +408,8 @@ export default {
             </div>
             <div  @click="selectSound(indexo)" class="cursor-pointer w-3/5 font-semibold text-left m-auto">
               <div class="font-semibold text-sm">
-                <p>{{audio.name}} {{audio.play_at.substr(2)}}</p>
-                <p class="text-xs" :class="indexo == index ? '' : 'text-gray-600' ">{{audio.artist}}</p>
+                <p>{{audio.program_name}} {{audio.play_at.substr(2)}}</p>
+                <p class="text-xs" :class="indexo == index ? '' : 'text-gray-600' ">{{audio.description}}</p>
               </div>
             </div>
             <div class="w-1/5 m-auto">
@@ -449,10 +425,10 @@ export default {
                   </svg>
                 </div>
 
-                <div v-if="isToday" >
+                <div class="hidden" v-if="isToday" >
                   <svg  @click="more(audio.code)" class="w-10 h-10 m-auto cursor-pointer"  height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M20 12l-2.83 2.83 9.17 9.17-9.17 9.17 2.83 2.83 12-12z"/><path d="M0 0h48v48h-48z" fill="none"/></svg>
                 </div>
-                <div v-else>
+                <div class="hidden" v-else>
                   <svg @click="backToday" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M30.83 32.67l-9.17-9.17 9.17-9.17-2.83-2.83-12 12 12 12z"/><path d="M0-.5h48v48h-48z" fill="none"/></svg>
                 </div>
               </div>
@@ -463,64 +439,73 @@ export default {
   </div>
 </div>
 
-<footer class="relative hidden  pt-8 pb-6 mt-8 bg-gradient-to-r from-gray-300 to-gray-400">
-  <div class="container mx-auto px-4">
-
-    <div class="flex h-16 items-center justify-center m-auto">
-      <div class="w-2/12 md:flex items-center hidden" v-for="(audio,indexo) in audios.slice(index, index + 1)" :key="indexo">
-        <div class="flex flex-col ml-2 font-semibold">
-          <p>{{audio.name}}</p>
-          <p class="h-4 overflow-hidden text-xs text-gray-600">{{audio.artist}}</p>
-        </div>
-      </div>
-      <div class="w-10/12 flex md:w-8/12 items-center">
-        <div class="text-sm text-grey-darker w-2/12 md:w-1/12 font-semibold">
-          <p>{{timer}}</p>
-        </div>
-        <div class="mt-1 relative w-8/12 md:w-10/12">
-          <div @click="seek($event)" ref="progress" class="h-1 bg-grey-dark cursor-pointer rounded-full bg-gray-500">
-            <div class="flex w-full justify-end h-1 bg-gradient-to-r from-red-500 to-red-700 rounded-full relative" :style="{'width' : step + '%'}">
-            </div>
-          </div>
-          <div class="flex w-full justify-end h-1 rounded-full relative" :style="{'width' : step + '%'}">
-            <span id="progressButtonTimer" style="top:-.6em" class="w-3 h-3 md:w-4 md:h-4 bg-gradient-to-r from-red-500 to-red-700 absolute pin-r pin-b rounded-full shadow"></span>
-          </div>
-        </div>
-        <div class="text-sm text-grey-darker w-2/12 md:w-1/12 font-semibold">
-          <p>{{duration}}</p>
-        </div>
-      </div>
-      <div class="flex md:w-2/12 m-auto items-center">
-        <div class="w-3/12 md:w-2/12 hover:bg-gray-500 rounded-full md:p-1" @click="mute()">
-          <svg v-if="mutePlayer" class="w-6 h-6 m-auto text-red-500 cursor-pointer" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-          </svg>
-          <svg v-else class="w-6 h-6 m-auto cursor-pointer" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-          </svg>
-        </div>
-        <div class="w-9/12 md:w-10/12 m-auto relative">
-          <div @click="volume($event)" ref="volBar" class="h-1 bg-grey-dark cursor-pointer rounded-full bg-gray-500 m-auto relative" style="width:100%">
-            <div class="flex justify-end h-1 bg-gradient-to-r from-teal-400 to-blue-500 rounded-full relative" :style="{'width' : volumeProgress + '%'}">
-            </div>
-          </div>
-          <div class="flex justify-end h-1 rounded-full relative" :style="{'width' : volumeProgress + '%'}">
-            <span id="progressButtonVolume" class="w-3 h-3 md:w-4 md:h-4 bg-gradient-to-r from-teal-400 to-blue-500 absolute pin-r pin-b -mb-1 rounded-full shadow"></span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</footer>
 
 </section>
 </template>
 
 <style>
 
+  .range-slider__range {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    border-radius: 0px;
+    background: #d7dcdf;
+    outline: none;
+    padding: 0;
+    margin: 0;
+  }
+  .range-slider__range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+            appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2c3e50;
+    cursor: pointer;
+    -webkit-transition: background 0.15s ease-in-out;
+    transition: background 0.15s ease-in-out;
+  }
+  .range-slider__range::-webkit-slider-thumb:hover {
+    background: #1abc9c;
+  }
+  .range-slider__range:active::-webkit-slider-thumb {
+    background: #1abc9c;
+  }
+  .range-slider__range::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border: 0;
+    border-radius: 50%;
+    background: #2c3e50;
+    cursor: pointer;
+    -moz-transition: background 0.15s ease-in-out;
+    transition: background 0.15s ease-in-out;
+  }
+  .range-slider__range::-moz-range-thumb:hover {
+    background: black;
+  }
+  .range-slider__range:active::-moz-range-thumb {
+    background: red;
+  }
+  .range-slider__range:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px #fff, 0 0 0 6px #1abc9c;
+  }
+
+  ::-moz-range-track {
+    background: #d7dcdf;
+    border: 0;
+  }
+
+  input::-moz-focus-inner,
+  input::-moz-focus-outer {
+    border: 0;
+  }
+
+
+
 .timer:before {
- content: "";
+   content: "";
    position: relative;
    top: -27px;
    right: -20px;
