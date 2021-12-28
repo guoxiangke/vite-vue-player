@@ -315,7 +315,7 @@ export default {
   <div class="w-full md:w-5/12 px-4">
         <img src="/logo.png" class="mb-4 md:mb-16 pt-2 md:pt-0" />
         <div class="flex flex-col w-full bg-gray-100 mb-4">
-          <div class="m-auto w-4/5 mt-4 mb-0 text-center">
+          <div class="m-auto w-full mt-4 mb-0 text-center">
             <div class="mb-4">
               <div class="text-xl p-auto flex justify-center text-grey-darkest font-semibold">
                 <span>{{currentAudio.program_name}}-20{{currentAudio.play_at}}</span>
@@ -372,11 +372,7 @@ export default {
             <div>{{timer}}</div>
           </div>
           <input @click="seek($event)" ref="progress" :value="step" class="w-full cursor-pointer range-slider__range" type="range" min="0" step="0.01" max="100">
-        </div>
-        <div class="hidden text-right  border-t-0 border-t-red-500" :style="{'width' : step + '%'}" >
-          <span class=" timer bg-gray-100 text-white pl-0 pr-3 p-1 rounded-full text-xs "></span>
-        </div>
-        
+        </div>        
         </div>
   
   <div class="w-full md:w-7/12 px-4 h-screen bg-gray-100" style="overflow-y:scroll;">
@@ -483,20 +479,8 @@ export default {
   }
 
 
-
-.timer:before {
-   content: "";
-   position: relative;
-   top: -27px;
-   right: -20px;
-   border-bottom: 8px solid black;
-   border-bottom-color: black; 
-   border-left: 8px solid transparent;
-   border-right: 8px solid transparent; 
-}
 .art {
   animation: rolling-disk 7.5s 0.25s linear infinite;
-  /*animation: rotation 2s infinite linear;*/
 }
 
 @keyframes rolling-disk {
