@@ -318,7 +318,7 @@ export default {
           <div class="m-auto w-4/5 mt-4 mb-0 text-center">
             <div class="mb-4">
               <div class="text-xl p-auto flex justify-center text-grey-darkest font-semibold">
-                <span>{{currentAudio.program_name}}-{{currentAudio.play_at}}</span>
+                <span>{{currentAudio.program_name}}-20{{currentAudio.play_at}}</span>
                  <span>
                   <div class="hidden md:hidden" v-if="isToday" >
                     <svg alt="更多" @click="more(currentAudio.code)" class="w-8 h-8 m-auto cursor-pointer" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M20 12l-2.83 2.83 9.17 9.17-9.17 9.17 2.83 2.83 12-12z"/><path d="M0 0h48v48h-48z" fill="none"/></svg>
@@ -391,7 +391,7 @@ export default {
             </div>
             <div  @click="selectSound(indexo)" class="cursor-pointer w-3/5 font-semibold text-left m-auto">
               <div class="font-semibold text-sm">
-                <p>{{audio.program_name}}-{{audio.play_at}}</p>
+                <p>{{audio.program_name}}-20{{audio.play_at}}</p>
                 <p class="text-xs" :class="indexo == index ? '' : 'text-gray-600' ">{{audio.description}}</p>
               </div>
             </div>
@@ -407,10 +407,10 @@ export default {
                   </svg>
                 </div>
 
-                <div class="hidden md:hidden" v-if="isToday" >
+                <div class="hidden" v-if="isToday" >
                   <svg alt="更多"  @click="more(audio.code)" class="w-10 h-10 m-auto cursor-pointer"  height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M20 12l-2.83 2.83 9.17 9.17-9.17 9.17 2.83 2.83 12-12z"/><path d="M0 0h48v48h-48z" fill="none"/></svg>
                 </div>
-                <div class="hidden md:hidden" v-else>
+                <div class="hidden" v-else>
                   <svg alt="返回" @click="backToday" class="w-10 h-10 m-auto cursor-pointer" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M30.83 32.67l-9.17-9.17 9.17-9.17-2.83-2.83-12 12 12 12z"/><path d="M0-.5h48v48h-48z" fill="none"/></svg>
                 </div>
               </div>
