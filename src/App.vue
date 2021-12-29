@@ -343,7 +343,7 @@ export default {
               </svg>
             </div>
             <div class="text-grey-darker hover:bg-gray-300 rounded-full p-1">
-              <svg alt="上一曲"  @click="prevButton ? previous() : ''" class="w-8 h-8 cursor-pointer" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <svg alt="上一个"  @click="prevButton ? previous() : ''" class="w-8 h-8 cursor-pointer" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                 <path d="M4 5h3v10H4V5zm12 0v10l-9-5 9-5z"/>
               </svg>
             </div>
@@ -357,12 +357,12 @@ export default {
               </svg>
             </div>
             <div class="text-grey-darker hover:bg-gray-300 rounded-full p-1">
-              <svg  alt="下一曲"  @click="nextButton ? next() : ''" class="w-8 h-8 cursor-pointer" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <svg  alt="下一个"  @click="nextButton ? next() : ''" class="w-8 h-8 cursor-pointer" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                 <path d="M13 5h3v10h-3V5zM4 5l9 5-9 5V5z"/>
               </svg>
             </div>
             <div class="text-grey-darker hover:bg-gray-300 rounded-full p-1">
-              <svg  alt="单曲循环" @click="repeat = !repeat" :class="repeat ? 'text-red-500':''" class="w-8 h-8 cursor-pointer" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <svg  alt="循环播放" @click="repeat = !repeat" :class="repeat ? 'text-red-500':''" class="w-8 h-8 cursor-pointer" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                 <path d="M5 4a2 2 0 0 0-2 2v6H0l4 4 4-4H5V6h7l2-2H5zm10 4h-3l4-4 4 4h-3v6a2 2 0 0 1-2 2H6l2-2h7V8z"/>
               </svg>
             </div>
