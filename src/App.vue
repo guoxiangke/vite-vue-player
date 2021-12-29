@@ -313,7 +313,7 @@ export default {
 <section class="relative bg-gray-100">
 <div class="h-screen  items-center flex flex-wrap">
   <div class="w-full md:w-5/12 px-4">
-        <img src="/logo.png" class="mb-4 md:mb-16 pt-2 md:pt-0" />
+        <img src="/logo.png" class="mb-4 md:mb-16 pt-2 md:pt-0" style="width:180px;" />
         <div class="flex flex-col w-full bg-gray-100 mb-4">
           <div class="m-auto w-full mt-4 mb-0 text-center">
             <div class="mb-4">
