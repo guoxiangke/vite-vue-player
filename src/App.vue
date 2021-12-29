@@ -44,7 +44,7 @@ export default {
           console.log(e)
         }
       }
-      this.currentAudio = audios[this.index]
+      this.currentAudio = this.audios[this.index]
     },
     methods: {
       backToday(){
