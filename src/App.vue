@@ -311,7 +311,7 @@ export default {
 <template>
 
 <section class="relative bg-gray-100">
-<div class="h-screen  items-center flex flex-wrap">
+<div class="items-center flex flex-wrap">
   <div class="w-full md:w-5/12 px-4">
         <img src="/logo.png" class="mb-4 md:mb-16 pt-4 px-2 md:pt-0" />
         <div class="flex flex-col w-full bg-gray-100 mb-4">
@@ -375,7 +375,7 @@ export default {
         </div>        
         </div>
   
-  <div class="w-full md:w-7/12 px-4 h-screen bg-gray-100" style="overflow-y:scroll;">
+  <div class="w-full md:w-7/12 px-4 md:h-screen" style="overflow-y:scroll;">
         <ul class="rounded-lg w-full md:w-10/12 overflow-auto m-auto mb-2 bg-gray-100 pt-2 min-h-96 " id="journal-scroll">
           <li
             :class="indexo == index ? 'bg-gradient-to-r from-red-400 via-red-500 to-red-600 text-white':''" 
