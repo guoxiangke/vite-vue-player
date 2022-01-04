@@ -31,7 +31,8 @@ export default {
         try {
           const response = await axios.get(`https://open.ly.yongbuzhixi.com/api/today`)
           // console.log(response.data.data)
-          this.audios = response.data.data
+          // this.audios = response.data.data
+          this.audios = this.audios.concat(response.data.data)
           var d = new Date();
           var h = d.getHours();
           var m = d.getMinutes();
@@ -118,8 +119,10 @@ export default {
       }
     },
     setup(){
-        const audios = ref([{program_name: 'Silver Spirit',link: 'h', play_at:'ee20211225', description: '生命之歌' ,howl: null}]);
-        const currentAudio = ref({program_name: 'Silver Spirit',link: 'h', play_at:'ee20211225', description: '生命之歌' ,howl: null});
+
+        const today = new Date().toISOString().slice(2,10).replace(/-/g,"");
+        const audios = ref([{program_name: '同行频道',link: 'https://ly729.out.airtime.pro/ly729_a', play_at:today, description: '网络频道每天廿四小时，循环不息，为你播出精彩节目' ,howl: null}]);
+        const currentAudio = ref({program_name: '同行频道',link: 'https://ly729.out.airtime.pro/ly729_a', play_at:today, description: '网络频道每天廿四小时，循环不息，为你播出精彩节目' ,howl: null});
         const step =  ref(0);
         const nextButton = ref(true);
         const prevButton = ref(true);
@@ -328,7 +331,7 @@ export default {
                   </div>
                 </span>
               </div>
-              <p :alt="currentAudio.description" class="text-sm text-grey mt-1">{{currentAudio.description}}</p>
+              <p :alt="currentAudio.description" class="text-sm text-grey mt-1" v-html="currentAudio.description"></p>
             </div>
             <div class="m-auto relative" style="width:300px;height:300px">
               <img :class="pauseTrack?'art':''" class="w-full rounded-full block m-auto h-full" src="/card-top.jpg" alt="Album Pic">
@@ -388,7 +391,7 @@ export default {
             <div  @click="selectSound(indexo)" class="cursor-pointer w-3/5 font-semibold text-left m-auto">
               <div class="font-semibold text-sm">
                 <p>{{audio.program_name}}-20{{audio.play_at}}</p>
-                <p class="text-xs" :class="indexo == index ? '' : 'text-gray-600' ">{{audio.description}}</p>
+                <p class="text-xs" :class="indexo == index ? '' : 'text-gray-600' " v-html="audio.description"></p>
               </div>
             </div>
             <div class="w-1/5 m-auto">
