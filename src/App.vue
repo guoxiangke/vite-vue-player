@@ -144,7 +144,7 @@ export default {
             audioPlaying: []
         })
         function formatTime(secs) {
-            var minutes = Math.floor(secs / 60) || 0;
+            var minutes = Math.floor((secs+1) / 60) || 0;
             var seconds = Math.floor(secs - minutes * 60) || 0;
             return (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
         }
