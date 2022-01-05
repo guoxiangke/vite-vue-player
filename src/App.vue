@@ -144,7 +144,7 @@ export default {
             audioPlaying: []
         })
         function formatTime(secs) {
-            var minutes = Math.floor((secs+1) / 60) || 0;
+            var minutes = Math.floor((secs) / 60) || 0;
             var seconds = Math.floor(secs - minutes * 60) || 0;
             return (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
         }
@@ -165,7 +165,7 @@ export default {
                     pauseTrack.value = true; 
                     nextButton.value = true;
                     prevButton.value = true;
-                    duration.value = formatTime(sound.duration());
+                    duration.value = formatTime(sound.duration()+1);
                     requestAnimationFrame(stepFunction.bind(this));
                 },
                 onpause: function(){
@@ -198,7 +198,7 @@ export default {
             var sound = audios.value[index.value].howl;
             var seek = sound.seek();
             timer.value = formatTime(Math.round(seek)); 
-            step.value = (seek * 100) / sound.duration();
+            step.value = (seek * 100) / sound.duration()+1;
             
             sliderBtn.value = (progress.value.offsetWidth * (step.value/100) + progress.value.offsetWidth * 0.05 - 25);
             
@@ -213,12 +213,12 @@ export default {
             if (sound) {
                 if (sound.playing()) {
                     sound.pause();
-                    sound.seek(sound.duration() * per);
+                    sound.seek(sound.duration()+1 * per);
                     var barWidth = (per * 100) / 100;
                     sliderBtn.value = (progress.value.offsetWidth * barWidth + progress.value.offsetWidth * 0.05 - 25);
                     sound.play();  
                 }else{
-                    sound.seek(sound.duration() * per);
+                    sound.seek(sound.duration()+1 * per);
                     var barWidth = (per * 100) / 100;
                     sliderBtn.value = (progress.value.offsetWidth * barWidth + progress.value.offsetWidth * 0.05 - 25);
                 }
