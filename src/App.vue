@@ -165,7 +165,8 @@ export default {
                     pauseTrack.value = true; 
                     nextButton.value = true;
                     prevButton.value = true;
-                    duration.value = formatTime(sound.duration()+1);
+                    length = sound.duration() == 'Infinity'?24*60:sound.duration()
+                    duration.value = formatTime(length);
                     requestAnimationFrame(stepFunction.bind(this));
                 },
                 onpause: function(){
@@ -197,8 +198,10 @@ export default {
         function stepFunction(){
             var sound = audios.value[index.value].howl;
             var seek = sound.seek();
-            timer.value = formatTime(Math.round(seek)); 
-            step.value = (seek * 100) / sound.duration()+1;
+            timer.value = formatTime(Math.round(seek));
+
+            length = sound.duration() == 'Infinity'?24*60:sound.duration()
+            step.value = (seek * 100) / length;
             
             sliderBtn.value = (progress.value.offsetWidth * (step.value/100) + progress.value.offsetWidth * 0.05 - 25);
             
@@ -208,17 +211,19 @@ export default {
         }
 
         function seek(event){
+            if(index.value ==0) return //同行频道 直播没有长度
             var per =  event.offsetX / progress.value.clientWidth; 
             var sound = audios.value[index.value].howl;
             if (sound) {
+                length = sound.duration() == 'Infinity'?24*60:sound.duration()
                 if (sound.playing()) {
                     sound.pause();
-                    sound.seek(sound.duration()+1 * per);
+                    sound.seek(length * per);
                     var barWidth = (per * 100) / 100;
                     sliderBtn.value = (progress.value.offsetWidth * barWidth + progress.value.offsetWidth * 0.05 - 25);
                     sound.play();  
                 }else{
-                    sound.seek(sound.duration()+1 * per);
+                    sound.seek(length * per);
                     var barWidth = (per * 100) / 100;
                     sliderBtn.value = (progress.value.offsetWidth * barWidth + progress.value.offsetWidth * 0.05 - 25);
                 }
