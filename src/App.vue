@@ -165,7 +165,7 @@ export default {
                     pauseTrack.value = true; 
                     nextButton.value = true;
                     prevButton.value = true;
-                    length = sound.duration() == 'Infinity'?24*60:sound.duration()
+                    length = sound.duration() == 'Infinity'?0:sound.duration()
                     duration.value = formatTime(length);
                     requestAnimationFrame(stepFunction.bind(this));
                 },
