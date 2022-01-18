@@ -31,8 +31,8 @@ export default {
         try {
           const response = await axios.get(`https://open.ly.yongbuzhixi.com/api/today`)
           // console.log(response.data.data)
-          // this.audios = response.data.data
-          this.audios = this.audios.concat(response.data.data)
+          this.audios = response.data.data
+          // this.audios = this.audios.concat(response.data.data)
           var d = new Date();
           var h = d.getHours();
           var m = d.getMinutes();
