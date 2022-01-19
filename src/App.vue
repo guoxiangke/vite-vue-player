@@ -211,7 +211,7 @@ export default {
         }
 
         function seek(event){
-            if(index.value ==0) return //同行频道 直播没有长度
+            // if(index.value ==0) return //同行频道 直播没有长度
             var per =  event.offsetX / progress.value.clientWidth; 
             var sound = audios.value[index.value].howl;
             if (sound) {
