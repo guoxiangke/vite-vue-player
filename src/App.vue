@@ -33,11 +33,12 @@ export default {
           // console.log(response.data.data)
           this.audios = response.data.data
           // this.audios = this.audios.concat(response.data.data)
-          var d = new Date();
-          var h = d.getHours();
-          var m = d.getMinutes();
-          var s = d.getSeconds();
-          let ttl = -3600*h-60*m-s+86400;
+          // var d = new Date();
+          // var h = d.getHours();
+          // var m = d.getMinutes();
+          // var s = d.getSeconds();
+          // let ttl = -3600*h-60*m-s+86400;
+          let ttl = 3600;
           this.$storage.setStorageSync("today", this.audios, ttl*1000);
 
         } catch (e) {
