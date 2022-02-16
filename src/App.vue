@@ -29,7 +29,7 @@ export default {
         this.audios = audios
       }else{
         try {
-          const response = await axios.get(`https://open.ly.yongbuzhixi.com/api/today`)
+          const response = await axios.get(`https://open.729ly.net/api/today`)
           // console.log(response.data.data)
           this.audios = response.data.data
           // this.audios = this.audios.concat(response.data.data)
